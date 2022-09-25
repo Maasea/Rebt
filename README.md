@@ -18,8 +18,9 @@ zip: faster startup but  bigger
 
 **Note**: 
 
-- All the file requires 64-bit system, but you can build 32-bit files by referring to the `For dev`
+- All the file require 64-bit system, but you can build 32-bit files by referring to the `For dev`
 - Configuration file directory: `user/username/razerbattery.ini`
+- To enable it to start with windows, place the file or a shortcut in the startup folder
 
 ## For dev
 
