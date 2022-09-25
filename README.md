@@ -1,6 +1,4 @@
-<div align="center">
-  <h1 align="center">Razer Mouse Battery Tray</h1>
-</div>
+<h1 align="center"><img class="center" src="icon.ico" alt="Icon" width=30px>   Rebt</h1>
 
 A simple system tray to display the Razer mouse battery.
 
