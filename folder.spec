@@ -37,7 +37,7 @@ exe = EXE(
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
-    icon='ui/imgs/icon.ico',
+    icon='icon.ico',
 )
 coll = COLLECT(
     exe,
@@ -47,5 +47,5 @@ coll = COLLECT(
     strip=False,
     upx=True,
     upx_exclude=[],
-    name='razerBattery',
+    name='Rebt',
 )

@@ -6,7 +6,7 @@ A simple system tray to display the Razer mouse battery.
 
 You can specify the mouse and adjust the frequency(minutes) of battery updates using the slider.
 
-<img src="https://raw.githubusercontent.com/Maasea/RazerMouseBatteryTray/main/imags/display.png" width="250" height="250">
+<img src="https://raw.githubusercontent.com/Maasea/RazerMouseBatteryTray/main/imgs/display.png" width="250" height="250">
 
 ## For user
 
@@ -19,7 +19,7 @@ zip: faster startup but  bigger
 **Note**: 
 
 - All the file require 64-bit system, but you can build 32-bit files by referring to the `For dev`
-- Configuration file directory: `user/username/razerbattery.ini`
+- Configuration file directory: `user/username/rebt.ini`
 - To enable it to start with windows, place the file or a shortcut in the startup folder
 
 ## For dev

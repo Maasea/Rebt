@@ -28,7 +28,7 @@ exe = EXE(
     a.zipfiles,
     a.datas,
     [],
-    name='razerBattery',
+    name='Rebt',
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
@@ -41,5 +41,5 @@ exe = EXE(
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
-    icon='ui/imgs/icon.ico',
+    icon='icon.ico',
 )

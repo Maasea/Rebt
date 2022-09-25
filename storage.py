@@ -302,7 +302,7 @@ class RazerStorage():
 
     def __init__(self):
         self.config = configparser.ConfigParser()
-        self.filename = "razerbattery.ini"
+        self.filename = "rebt.ini"
         self.path = os.path.join(Path.home(),self.filename)
         self.config["DEFAULT"] = {}
         self.setInterval(15)

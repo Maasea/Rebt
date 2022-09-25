@@ -20,13 +20,13 @@ class MainWindow(QMainWindow):
         self.half = QIcon(':/resource/imgs/half.svg')
         self.low = QIcon(':/resource/imgs/low.svg')
         self.empty = QIcon(':/resource/imgs/empty.svg')
-        self.defaultIcon = QIcon(':/resource/imgs/icon.ico')
+        self.defaultIcon = QIcon(':/resource/imgs/icon.png')
         self.curIcon = self.defaultIcon
         self.clickCount = 0
 
         # Init System tray
         self.tray = QSystemTrayIcon(self)
-        self.tray.setIcon(self.curIcon)
+        self.tray.setIcon(self.defaultIcon)
         self.tray.activated.connect(self.trigger)
         self.tray.setVisible(True)
         try:
@@ -34,7 +34,7 @@ class MainWindow(QMainWindow):
             self.minutes = self.rz.config.getDefault(
                 "interval")  # refresh interval
         except RuntimeError as e:
-            self.tray.showMessage("Error", str(e), self.curIcon)
+            self.tray.showMessage("Error", str(e), self.defaultIcon)
             time.sleep(4)
             sys.exit(0)
 
@@ -42,7 +42,7 @@ class MainWindow(QMainWindow):
             self.tray.showMessage(
                 "Detected",
                 self.rz.config.getDefault("name").replace("_", " "),
-                self.curIcon)
+                self.defaultIcon)
         # Popup window Properties
         self.window_width = 400
         self.window_height = 260
