@@ -4,7 +4,7 @@ A simple system tray to display the Razer mouse battery.
 
 You can specify the mouse and adjust the frequency(minutes) of battery updates using the slider.
 
-![display](imags/display.png)
+<img src="https://raw.githubusercontent.com/Maasea/razerBattery/main/imags/display.png" width="200" height="200">
 
 ## For user
 
