@@ -1,0 +1,14 @@
+<RCC>
+  <qresource prefix="resource">
+    <file>imgs/clock.png</file>
+    <file>imgs/close.png</file>
+    <file>imgs/empty.svg</file>
+    <file>imgs/full.svg</file>
+    <file>imgs/half.svg</file>
+    <file>imgs/icon.ico</file>
+    <file>imgs/low.svg</file>
+    <file>imgs/most.svg</file>
+    <file>imgs/mouse.png</file>
+    <file>tool.ui</file>
+  </qresource>
+</RCC>
