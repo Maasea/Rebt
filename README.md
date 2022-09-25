@@ -1,10 +1,12 @@
-<h1 style="text-align: center;">Razer Battery</h1>
+<div align="center">
+  <h1 align="center">Razer Battery</h1>
+</div>
 
 A simple system tray to display the Razer mouse battery.
 
 You can specify the mouse and adjust the frequency(minutes) of battery updates using the slider.
 
-<img src="https://raw.githubusercontent.com/Maasea/razerBattery/main/imags/display.png" width="200" height="200">
+<img src="https://raw.githubusercontent.com/Maasea/razerBattery/main/imags/display.png" width="250" height="250">
 
 ## For user
 
