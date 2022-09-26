@@ -2,19 +2,18 @@ import sys
 import time
 import resource
 from storage import DEVICE
-from controller import Razer
+from controller import Rebt
 from PySide2.QtUiTools import QUiLoader
 from PySide2.QtWidgets import QApplication, QMainWindow, QSystemTrayIcon, QToolTip
-from PySide2.QtCore import Qt, QRectF, QTimer, QObject, Signal, QFile
-from PySide2.QtGui import QIcon, QPainterPath, QRegion, QTransform, QCursor
-from threading import Thread
+from PySide2.QtCore import Qt, QRectF, QTimer, QObject, Signal, QThread
+from PySide2.QtGui import QIcon, QPainterPath, QRegion, QTransform, QCursor, QPixmap, QPainter, QFont
 
 
 class MainWindow(QMainWindow):
 
     def __init__(self):
         super().__init__()
-        # Razer battery Properties
+        # Icon
         self.full = QIcon(':/resource/imgs/full.svg')
         self.most = QIcon(':/resource/imgs/most.svg')
         self.half = QIcon(':/resource/imgs/half.svg')
@@ -22,6 +21,7 @@ class MainWindow(QMainWindow):
         self.empty = QIcon(':/resource/imgs/empty.svg')
         self.defaultIcon = QIcon(':/resource/imgs/icon.png')
         self.curIcon = self.defaultIcon
+        self.setWindowIcon(self.defaultIcon)
         self.clickCount = 0
 
         # Init System tray
@@ -30,67 +30,56 @@ class MainWindow(QMainWindow):
         self.tray.activated.connect(self.trigger)
         self.tray.setVisible(True)
         try:
-            self.rz = Razer()
-            self.minutes = self.rz.config.getDefault(
-                "interval")  # refresh interval
+            self.rebt = Rebt()
+            self.minutes = self.rebt.config.getDefault("interval")
         except RuntimeError as e:
             self.tray.showMessage("Error", str(e), self.defaultIcon)
             time.sleep(4)
             sys.exit(0)
+        if self.rebt.firstRun:
+            self.tray.showMessage("Detected",
+                                  self.rebt.config.getDefault("name").replace("_", " "),
+                                  self.defaultIcon)
 
-        if self.rz.firstRun:
-            self.tray.showMessage(
-                "Detected",
-                self.rz.config.getDefault("name").replace("_", " "),
-                self.defaultIcon)
         # Popup window Properties
         self.window_width = 400
         self.window_height = 260
         self.setFixedSize(self.window_width, self.window_height)
         self.setWindowFlags(Qt.Popup | Qt.WindowStaysOnTopHint)
         self.setWindowOpacity(0.9)
-
-        # Init Control Pannel
-        uiFile = QFile(':/resource/tool.ui')
-        uiFile.open(QFile.ReadOnly)
-        loader = QUiLoader()
-        self.controlPanel = loader.load(uiFile, self)
-        uiFile.close()
+        # Init Control Panel
+        self.controlPanel = QUiLoader().load(':/resource/tool.ui')
         self.controlPanel.setFixedSize(self.window_width, self.window_height)
         self.controlPanel.closeButton.clicked.connect(app.quit)
         self.controlPanel.intervalSlider.setValue(self.minutes)
         self.controlPanel.intervalLabel.setText(str(self.minutes))
-        self.controlPanel.intervalSlider.sliderMoved.connect(
-            lambda value: QToolTip.showText(QCursor.pos(), str(value)))
-        self.controlPanel.intervalSlider.sliderReleased.connect(
-            self.updateInterval)
+        self.controlPanel.intervalSlider.sliderMoved.connect(self.showTips)
+        self.controlPanel.intervalSlider.sliderReleased.connect(self.updateInterval)
         self.controlPanel.deviceBox.addItems(DEVICE.keys())
-        self.controlPanel.deviceBox.setCurrentText(
-            self.rz.config.getDefault("name"))
-        self.controlPanel.deviceBox.currentTextChanged.connect(
-            self.updateDevice)
+        self.controlPanel.deviceBox.setCurrentText(self.rebt.config.getDefault("name"))
+        self.controlPanel.deviceBox.currentTextChanged.connect(self.updateDevice)
         self.setCentralWidget(self.controlPanel)
-
-        # backgroundRefresh when show window
-        self.refreshSignal = RefreshSignal()
-        self.refreshSignal.update.connect(self.backRefresh)
-        # update
-        self.refreshSignal.update.emit()
-
-        # Popup window show position
-        self.changeShowPosition()
-
         self.radius = 18
         self.setStyleSheet('''
             QMenu {{
                 border-radius: {radius}px;
             }}
         '''.format(radius=self.radius))
+        self.changeShowPosition()
 
-        # Init razer battery refresh Timer
+        # create refresh thread
+        self.refreshThread = QThread()
+        self.refreshWorker = RefreshWorker(self.updateBatteryInfo)
+        self.refreshWorker.moveToThread(self.refreshThread)
+        self.refreshThread.started.connect(self.refreshWorker.run)
+        self.refreshWorker.finished.connect(self.refreshThread.quit)
+        # refresh now
+        self.refreshThread.start()
+
+        # Init refresh Timer
         self.timer = QTimer()
-        self.timer.setInterval(self.minutes * 60 * 1000)
-        self.timer.timeout.connect(self.updateBatteryInfo)
+        self.timer.setInterval(self.toMillisecond(self.minutes))
+        self.timer.timeout.connect(self.refreshThread.start)
         self.timer.start()
 
     def hideEvent(self, event):
@@ -106,7 +95,7 @@ class MainWindow(QMainWindow):
         c_x = cPosition.x()
         c_y = cPosition.y()
 
-        if not (min_x < c_x and c_x < max_x and min_y < c_y and c_y < max_y):
+        if not (min_x < c_x < max_x and min_y < c_y < max_y):
             self.clickCount += 1
         return super().hideEvent(event)
 
@@ -126,18 +115,29 @@ class MainWindow(QMainWindow):
             if self.clickCount % 2:
                 self.changeShowPosition()
                 self.show()
-                self.refreshSignal.update.emit()
+                self.refreshThread.start()
+
+    def showTips(self, value):
+        QToolTip.showText(QCursor.pos(), str(value))
+
+    def drawTrayIcon(self, battery):
+        pixmap = QPixmap(64, 64)
+        pixmap.fill(Qt.transparent)
+        painter = QPainter(pixmap)
+        painter.setFont(QFont("Microsoft YaHei", 26))
+        painter.drawText(pixmap.rect(), Qt.AlignCenter, str(battery))
+        painter.end()
+        return pixmap
 
     def changeShowPosition(self):
         trayPosition = self.tray.geometry()
-        x = trayPosition.x() - (
-            (self.window_width - trayPosition.width()) >> 1)
+        x = trayPosition.x() - ((self.window_width - trayPosition.width()) >> 1)
         y = trayPosition.y() - (self.window_height + 20)
         self.move(x, y)
 
     def getBatteryInfo(self):
         try:
-            battery = self.rz.get_battery()
+            battery = self.rebt.get_battery()
         except RuntimeError as e:
             battery = 0
             self.tray.showMessage("Error", str(e), self.defaultIcon)
@@ -156,35 +156,44 @@ class MainWindow(QMainWindow):
         icon, battery = self.getBatteryInfo()
         self.tray.setToolTip(f"{battery}%")
         self.controlPanel.battery.setText(f' {battery}%')
-        if icon != self.curIcon:
+        if self.rebt.config.getDefault("trayStyle"):
+            self.tray.setIcon(self.drawTrayIcon(battery))
+        else:
             self.tray.setIcon(icon)
+        if icon != self.curIcon:
             self.controlPanel.battery.setIcon(icon)
             self.curIcon = icon
 
     def updateInterval(self):
         minutes = self.controlPanel.intervalSlider.value()
         self.controlPanel.intervalLabel.setText(str(minutes))
-        self.timer.setInterval(minutes * 60 * 1000)
-
+        self.timer.setInterval(self.toMillisecond(minutes))
         # write to default file
-        self.rz.config.setInterval(minutes)
-        self.rz.config.save()
+        self.rebt.config.setInterval(minutes)
+        self.rebt.config.save()
 
     def updateDevice(self, name):
         deviceInfo = DEVICE[name]
-        self.rz.config.setDevice(name, deviceInfo["usbId"],
-                                 deviceInfo["tranId"])
-        self.rz.findAll = False
-        self.refreshSignal.update.emit()
-        self.rz.config.save()
+        self.rebt.config.setDevice(name, deviceInfo["usbId"], deviceInfo["tranId"])
+        self.rebt.findAll = False
+        self.refreshThread.start()
+        self.rebt.config.save()
 
-    def backRefresh(self):
-        t = Thread(target=self.updateBatteryInfo)
-        t.start()
+    def toMillisecond(self, minutes):
+        return minutes * 60 * 1000
 
 
-class RefreshSignal(QObject):
-    update = Signal()
+class RefreshWorker(QObject):
+    finished = Signal()
+
+    def __init__(self, func):
+        super().__init__()
+        self.func = func
+
+    def run(self):
+        if self.func:
+            self.func()
+        self.finished.emit()
 
 
 if __name__ == "__main__":

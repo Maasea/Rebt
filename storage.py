@@ -1,4 +1,4 @@
-import configparser
+from configparser import ConfigParser
 from pathlib import Path
 import os
 
@@ -298,14 +298,15 @@ DEVICE = {
 }
 
 
-class RazerStorage():
+class RebtStorage:
 
     def __init__(self):
-        self.config = configparser.ConfigParser()
+        self.config = ConfigParser()
         self.filename = "rebt.ini"
-        self.path = os.path.join(Path.home(),self.filename)
+        self.path = os.path.join(Path.home(), self.filename)
         self.config["DEFAULT"] = {}
         self.setInterval(15)
+        self.setTrayStyle(0)
         self.readConfig()
 
     def isExist(self):
@@ -314,10 +315,6 @@ class RazerStorage():
     def readConfig(self):
         if self.isExist():
             self.config.read(self.path)
-            self.setInterval(self.config["DEFAULT"]["interval"])
-            self.setDevice(self.config["DEFAULT"]["name"],
-                           self.config["DEFAULT"]["usbId"],
-                           self.config["DEFAULT"]["tranId"])
 
     def generate(self, devcieName, usbId, tranId):
         self.setDevice(devcieName, usbId, tranId)
@@ -327,8 +324,8 @@ class RazerStorage():
         value = self.config.get("DEFAULT", option)
         if option == "interval": value = int(value)
         if option == "usbId": value = int(value, 16)
-        if option == "tranId":
-            value = int(value, 16).to_bytes(1, byteorder="big")
+        if option == "tranId": value = int(value, 16).to_bytes(1, byteorder="big")
+        if option == "trayStyle": value = int(value)
         return value
 
     def setInterval(self, minutes):
@@ -338,6 +335,9 @@ class RazerStorage():
         self.config.set("DEFAULT", "name", devcieName)
         self.config.set("DEFAULT", "usbId", usbId)
         self.config.set("DEFAULT", "tranId", tranId)
+
+    def setTrayStyle(self, style):
+        self.config.set("DEFAULT", "trayStyle", str(style))
 
     def save(self, type="w"):
         with open(self.path, type) as configfile:
