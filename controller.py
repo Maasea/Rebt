@@ -56,7 +56,10 @@ class Rebt:
         self.mouse = self.get_mouse()
         usb.util.claim_interface(self.mouse, 0)
         self.mouse.set_configuration()
-        self.mouse.ctrl_transfer(bmRequestType=0x21, bRequest=0x09, wValue=0x300, data_or_wLength=self.battery_msg(),
+        self.mouse.ctrl_transfer(bmRequestType=0x21,
+                                 bRequest=0x09,
+                                 wValue=0x300,
+                                 data_or_wLength=self.battery_msg(),
                                  wIndex=0x00)
         time.sleep(0.1)
         result = self.mouse.ctrl_transfer(bmRequestType=0xa1,
@@ -66,4 +69,6 @@ class Rebt:
                                           wIndex=0x00)
         usb.util.dispose_resources(self.mouse)
         usb.util.release_interface(self.mouse, 0)
-        return int(result[9] / 255 * 100)
+        battery = result[9]
+        if battery == 0: return -1
+        return int(battery / 255 * 100)
