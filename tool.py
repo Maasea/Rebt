@@ -1,6 +1,7 @@
 import sys
 import time
 import resource
+from drawtray import TrayIcon
 from storage import DEVICE
 from controller import Rebt
 from PySide2.QtUiTools import QUiLoader
@@ -20,7 +21,6 @@ class MainWindow(QMainWindow):
         self.low = QIcon(':/resource/imgs/low.svg')
         self.empty = QIcon(':/resource/imgs/empty.svg')
         self.defaultIcon = QIcon(':/resource/imgs/icon.png')
-        self.curIcon = self.defaultIcon
         self.setWindowIcon(self.defaultIcon)
         self.clickCount = 0
 
@@ -141,28 +141,23 @@ class MainWindow(QMainWindow):
         except RuntimeError as e:
             battery = 0
             self.tray.showMessage("Error", str(e), self.defaultIcon)
-        icon = self.full
-        if battery <= 85:
-            icon = self.most
-        if battery <= 65:
-            icon = self.half
-        if battery <= 35:
-            icon = self.low
-        if battery <= 10:
-            icon = self.empty
-        return icon, battery
+
+        if battery == -1:
+            return self.defaultIcon, TrayIcon().draw(0, 1), 0
+
+        if self.rebt.config.getDefault("trayStyle") == 1:
+            trayIcon = widgetIcon = TrayIcon().draw(battery, 1)
+        else:
+            trayIcon = TrayIcon().draw(battery, 0)
+            widgetIcon = TrayIcon().draw(battery, 1)
+        return trayIcon, widgetIcon, battery
 
     def updateBatteryInfo(self):
-        icon, battery = self.getBatteryInfo()
+        trayIcon, widgetIcon, battery = self.getBatteryInfo()
         self.tray.setToolTip(f"{battery}%")
+        self.tray.setIcon(trayIcon)
         self.controlPanel.battery.setText(f' {battery}%')
-        if self.rebt.config.getDefault("trayStyle"):
-            self.tray.setIcon(self.drawTrayIcon(battery))
-        else:
-            self.tray.setIcon(icon)
-        if icon != self.curIcon:
-            self.controlPanel.battery.setIcon(icon)
-            self.curIcon = icon
+        self.controlPanel.battery.setIcon(widgetIcon)
 
     def updateInterval(self):
         minutes = self.controlPanel.intervalSlider.value()
