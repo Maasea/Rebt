@@ -20,6 +20,18 @@ zip: faster startup but  bigger
 - Configuration file directory: `user/username/rebt.ini`
 - To enable it to start with windows, place the file or a shortcut in the startup folder
 
+#### Configuration
+
+```
+[DEFAULT]
+interval = [0-120] 
+traystyle = [0,1]
+scale = [seconds, minutes]
+name = Mouse Name
+usbid = USB ID
+tranid = xxxx
+```
+
 ## For dev
 
 1. You need download [libusb](https://libusb.info/), and put `libusb-1.0.dll` in the project's root directory.
