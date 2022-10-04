@@ -5,7 +5,7 @@ block_cipher = None
 
 
 a = Analysis(
-    ['tool.py'],
+    ['./src/ui.py'],
     pathex=[],
     binaries=[('libusb-1.0.dll','.')],
     datas=[],
