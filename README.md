@@ -2,7 +2,7 @@
 
 A simple system tray to display the Razer mouse battery.
 
-You can specify the mouse and adjust the frequency(minutes) of battery updates using the slider.
+You can specify the mouse and adjust the frequency of battery updates using the slider.
 
 <img src="imgs/display.png" width="250" height="250">
 
@@ -20,7 +20,7 @@ zip: faster startup but  bigger
 - Configuration file directory: `user/username/rebt.ini`
 - To enable it to start with windows, place the file or a shortcut in the startup folder
 
-#### Configuration
+### Configuration
 
 ```
 [DEFAULT]
@@ -63,3 +63,8 @@ tranid = xxxx
 
 This project is dependent on  [razer-mouse-battery-windows](https://github.com/hsutungyu/razer-mouse-battery-windows).
 
+## Troubleshooting
+
+All tests are based on **Razer Viper Ultimate Wireless**
+
+You can delete the config file to reset Rebt.
