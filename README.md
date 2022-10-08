@@ -6,7 +6,7 @@ You can specify the mouse and adjust the frequency of battery updates using the 
 
 <img src="imgs/tray_0.png"> <img src="imgs/tray_1.png">
 
-<img src="imgs/display.png" width="250" height="250">
+<img src="imgs/display.png" width="210" height="180">
 
 ## For user
 
