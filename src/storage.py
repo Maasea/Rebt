@@ -343,6 +343,6 @@ class RebtStorage:
     def setScale(self, scale):
         self.config.set("DEFAULT", "scale", scale)
 
-    def save(self, type="w"):
-        with open(self.path, type) as configfile:
+    def save(self):
+        with open(self.path, "w") as configfile:
             self.config.write(configfile)
