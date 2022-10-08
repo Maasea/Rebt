@@ -15,12 +15,12 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         # Icon
-        self.full = QIcon(':/resource/imgs/full.svg')
-        self.most = QIcon(':/resource/imgs/most.svg')
-        self.half = QIcon(':/resource/imgs/half.svg')
-        self.low = QIcon(':/resource/imgs/low.svg')
-        self.empty = QIcon(':/resource/imgs/empty.svg')
-        self.defaultIcon = QIcon(':/resource/imgs/icon.png')
+        self.full = QIcon(":/resource/imgs/full.svg")
+        self.most = QIcon(":/resource/imgs/most.svg")
+        self.half = QIcon(":/resource/imgs/half.svg")
+        self.low = QIcon(":/resource/imgs/low.svg")
+        self.empty = QIcon(":/resource/imgs/empty.svg")
+        self.defaultIcon = QIcon(":/resource/imgs/icon.png")
         self.setWindowIcon(self.defaultIcon)
         self.clickCount = 0
         self.curBattery = -1
@@ -52,7 +52,7 @@ class MainWindow(QMainWindow):
         self.setWindowFlags(Qt.Popup | Qt.WindowStaysOnTopHint)
         self.setWindowOpacity(0.9)
         # Init Control Panel
-        self.controlPanel = QUiLoader().load(':/resource/tool.ui')
+        self.controlPanel = QUiLoader().load(":/resource/tool.ui")
         self.controlPanel.setFixedSize(self.window_width, self.window_height)
         self.controlPanel.closeButton.clicked.connect(self.quitApp)
         self.controlPanel.intervalSlider.setValue(self.interval)
@@ -162,7 +162,7 @@ class MainWindow(QMainWindow):
         trayIcon, widgetIcon = self.generateIcon(battery, isCharge)
         self.tray.setToolTip(f"{battery}%")
         self.tray.setIcon(trayIcon)
-        self.controlPanel.battery.setText(f' {battery}%')
+        self.controlPanel.battery.setText(f" {battery}%")
         self.controlPanel.battery.setIcon(widgetIcon)
 
     def updateInterval(self):
