@@ -4,6 +4,8 @@ A simple system tray to display the Razer mouse battery.
 
 You can specify the mouse and adjust the frequency of battery updates using the slider.
 
+<img src="imgs/tray_0.png"> <img src="imgs/tray_1.png">
+
 <img src="imgs/display.png" width="250" height="250">
 
 ## For user
@@ -21,6 +23,8 @@ zip: faster startup but  bigger
 - To enable it to start with windows, place the file or a shortcut in the startup folder
 
 ### Configuration
+
+The configuration file will be generated automatically when a Razer device is detected. You can change the icon style and update interval by editing it.
 
 ```
 [DEFAULT]
