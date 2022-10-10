@@ -121,6 +121,8 @@ class MainWindow(QMainWindow):
                 self.changeShowPosition()
                 self.show()
                 self.updateThread.start()
+        elif reason == QSystemTrayIcon.Context:
+            self.clickCount += 1
 
     def showTips(self, value):
         QToolTip.showText(QCursor.pos(), str(value))
