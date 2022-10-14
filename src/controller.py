@@ -39,7 +39,7 @@ class Rebt:
         return mouse
 
     def generate_msg(self, transaction_id, command_class, command_id, data_size):
-        msgs = [0x00, transaction_id, 0x00, 0x00, 0x00, command_class, command_id, data_size]
+        msgs = [0x00, transaction_id, 0x00, 0x00, 0x00, data_size, command_class, command_id]
         msg = bytes(msgs)
         crc = 0
         for i in msg[2:]:
@@ -49,10 +49,10 @@ class Rebt:
         return msg
 
     def battery_msg(self):
-        return self.generate_msg(self.config.getDefault("tranId"), 0x02, 0x07, 0x80)
+        return self.generate_msg(self.config.getDefault("tranId"), 0x07, 0x80, 0x02)
 
     def charge_msg(self):
-        return self.generate_msg(self.config.getDefault("tranId"), 0x02, 0x07, 0x84)
+        return self.generate_msg(self.config.getDefault("tranId"), 0x07, 0x84, 0x02)
 
     def send_msg(self, msg):
         self.mouse = self.get_mouse()
