@@ -15,11 +15,6 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         # Icon
-        self.full = QIcon(":/resource/imgs/full.svg")
-        self.most = QIcon(":/resource/imgs/most.svg")
-        self.half = QIcon(":/resource/imgs/half.svg")
-        self.low = QIcon(":/resource/imgs/low.svg")
-        self.empty = QIcon(":/resource/imgs/empty.svg")
         self.defaultIcon = QIcon(":/resource/imgs/icon.png")
         self.setWindowIcon(self.defaultIcon)
         self.clickCount = 0
@@ -156,8 +151,6 @@ class MainWindow(QMainWindow):
 
     def updateBatteryInfo(self):
         battery, isCharge = self.getBatteryInfo()
-        if battery == self.curBattery and self.chargeStatus == isCharge:
-            return
 
         self.curBattery = battery
         self.chargeStatus = isCharge

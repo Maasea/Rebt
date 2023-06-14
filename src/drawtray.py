@@ -1,6 +1,7 @@
 from PySide2.QtCore import Qt, QRect, QRectF, QSize, QPointF
 from PySide2.QtGui import QPixmap, QPainter, QFont, QColor, QPen, QFontMetrics
 from PySide2.QtWidgets import QApplication
+import darkdetect
 
 
 class TrayIcon:
@@ -39,16 +40,23 @@ class TrayIcon:
         self.painter.drawChord(p, 0, 360 * 16)
 
     def drawNumIcon(self, battery, isCharge):
-        if isCharge: self.drawChargeIcon(26)
-        ft = QFont("Microsoft YaHei", 48)
-        ft_rect = QFontMetrics(ft).boundingRect(str(battery))
-        scale = ft_rect.width() / self.pixmap.width()
-        if scale > 1:
-            ft.setPointSize(36)
-        elif scale < 0.5:
-            ft.setPointSize(62)
+        if isCharge:
+            self.drawChargeIcon(26)
+
+        pen_color = Qt.white if darkdetect.isDark() else Qt.black
+        default_size = 62
+        ft = QFont("Microsoft YaHei", default_size)
+        while True:
+            ft.setPointSize(default_size)
+            ft_rect = QFontMetrics(ft).boundingRect(str(battery))
+
+            if ft_rect.width() <= self.pixmap.width() and ft_rect.height() <= self.pixmap.height():
+                break
+            else:
+                default_size -= 3
+
         self.painter.setFont(ft)
-        self.painter.setPen(Qt.black)
+        self.painter.setPen(pen_color)
         self.painter.setRenderHint(QPainter.HighQualityAntialiasing)
         self.painter.drawText(self.pixmap.rect(), Qt.AlignCenter, str(battery))
 
