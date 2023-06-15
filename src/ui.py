@@ -139,14 +139,16 @@ class MainWindow(QMainWindow):
         return battery, isCharge
 
     def generateIcon(self, battery, isCharge):
-        if battery == -1:
-            return self.defaultIcon, TrayIcon().draw(0, isCharge, 1)
+        tray = TrayIcon('Tray')
+        widget = TrayIcon('Widget')
 
-        if self.rebt.config.getDefault("trayStyle") == 1:
-            trayIcon = widgetIcon = TrayIcon().draw(battery, isCharge, 1)
-        else:
-            trayIcon = TrayIcon().draw(battery, isCharge, 0)
-            widgetIcon = TrayIcon().draw(battery, isCharge, 1)
+        if battery == -1:
+            return self.defaultIcon, widget.draw(0, isCharge, 1)
+
+        widgetIcon = widget.draw(battery, isCharge, 1)
+
+        tray_style = self.rebt.config.getDefault("trayStyle")
+        trayIcon = tray.draw(battery, isCharge, tray_style)
         return trayIcon, widgetIcon
 
     def updateBatteryInfo(self):

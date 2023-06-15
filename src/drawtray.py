@@ -6,12 +6,16 @@ import darkdetect
 
 class TrayIcon:
 
-    def __init__(self):
+    def __init__(self, IconType='Tray'):
         self.bgWidth = 128
         self.bgHeight = 128
         self.pixmap = QPixmap(self.bgWidth, self.bgHeight)
         self.pixmap.fill(Qt.transparent)
         self.painter = QPainter(self.pixmap)
+        if IconType == 'Tray':
+            self._color = Qt.white if darkdetect.isDark() else Qt.black
+        else:
+            self._color = Qt.black
 
     def centerWidth(self, width):
         return (self.bgWidth - width) >> 1
@@ -43,7 +47,6 @@ class TrayIcon:
         if isCharge:
             self.drawChargeIcon(26)
 
-        pen_color = Qt.white if darkdetect.isDark() else Qt.black
         default_size = 62
         ft = QFont("Microsoft YaHei", default_size)
         while True:
@@ -56,14 +59,14 @@ class TrayIcon:
                 default_size -= 3
 
         self.painter.setFont(ft)
-        self.painter.setPen(pen_color)
+        self.painter.setPen(self._color)
         self.painter.setRenderHint(QPainter.HighQualityAntialiasing)
         self.painter.drawText(self.pixmap.rect(), Qt.AlignCenter, str(battery))
 
         self.painter.end()
 
     def drawRectIcon(self, battery, isCharge):
-        self.painter.setBrush(Qt.black)
+        self.painter.setBrush(self._color)
         self.painter.setPen(Qt.transparent)
         brt = self.drawRoundedRect((16, 42), 6)
 
@@ -76,10 +79,11 @@ class TrayIcon:
 
         # big rect
         self.painter.setCompositionMode(QPainter.CompositionMode_DestinationOver)
-        self.painter.setPen(QPen(Qt.black, 9))
+        self.painter.setPen(QPen(self._color, 9))
         self.painter.setBrush(Qt.transparent)
         brt_ = self.drawRoundedRect((6, 30), 16)
-        if isCharge: self.drawChargeIcon()
+        if isCharge:
+            self.drawChargeIcon()
         self.painter.end()
 
     def draw(self, battery, isCharge, style=0):
