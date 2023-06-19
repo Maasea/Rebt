@@ -1,7 +1,7 @@
 import sys
 import time
 import resource
-from drawtray import TrayIcon
+from drawtray import TrayIcon, IconStyle
 from storage import DEVICE
 from controller import Rebt
 from PySide2.QtUiTools import QUiLoader
@@ -143,12 +143,13 @@ class MainWindow(QMainWindow):
         widget = TrayIcon('Widget')
 
         if battery == -1:
-            return self.defaultIcon, widget.draw(0, isCharge, 1)
+            return self.defaultIcon, widget.draw(0, isCharge, IconStyle.RECT)
 
-        widgetIcon = widget.draw(battery, isCharge, 1)
+        widgetIcon = widget.draw(battery, isCharge, IconStyle.RECT)
 
-        tray_style = self.rebt.config.getDefault("trayStyle")
-        trayIcon = tray.draw(battery, isCharge, tray_style)
+        icon_style = IconStyle(self.rebt.config.getDefault("trayStyle"))
+
+        trayIcon = tray.draw(battery, isCharge, icon_style)
         return trayIcon, widgetIcon
 
     def updateBatteryInfo(self):

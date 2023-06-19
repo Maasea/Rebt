@@ -1,17 +1,23 @@
 from PySide2.QtCore import Qt, QRect, QRectF, QSize, QPointF
 from PySide2.QtGui import QPixmap, QPainter, QFont, QColor, QPen, QFontMetrics
 from PySide2.QtWidgets import QApplication
+from enum import Enum
 import darkdetect
+
+
+class IconStyle(Enum):
+    NUM = 0
+    RECT = 1
 
 
 class TrayIcon:
 
     def __init__(self, IconType='Tray'):
+        self.painter = None
         self.bgWidth = 128
         self.bgHeight = 128
         self.pixmap = QPixmap(self.bgWidth, self.bgHeight)
         self.pixmap.fill(Qt.transparent)
-        self.painter = QPainter(self.pixmap)
         if IconType == 'Tray':
             self._color = Qt.white if darkdetect.isDark() else Qt.black
         else:
@@ -48,12 +54,16 @@ class TrayIcon:
             self.drawChargeIcon(26)
 
         default_size = 62
+        min_size = 30
         ft = QFont("Microsoft YaHei", default_size)
+
         while True:
             ft.setPointSize(default_size)
             ft_rect = QFontMetrics(ft).boundingRect(str(battery))
 
             if ft_rect.width() <= self.pixmap.width() and ft_rect.height() <= self.pixmap.height():
+                break
+            if default_size < min_size:
                 break
             else:
                 default_size -= 3
@@ -86,9 +96,13 @@ class TrayIcon:
             self.drawChargeIcon()
         self.painter.end()
 
-    def draw(self, battery, isCharge, style=0):
-        if style == 0:
+    def draw(self, battery, isCharge, style=IconStyle.NUM):
+        self.painter = QPainter(self.pixmap)
+
+        if style == IconStyle.NUM:
             self.drawNumIcon(battery, isCharge)
         else:
             self.drawRectIcon(battery, isCharge)
+
+        del self.painter
         return self.pixmap
