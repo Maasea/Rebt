@@ -8,6 +8,7 @@ from PySide2.QtUiTools import QUiLoader
 from PySide2.QtWidgets import QApplication, QMainWindow, QSystemTrayIcon, QToolTip
 from PySide2.QtCore import Qt, QRectF, QTimer, QObject, Signal, QThread
 from PySide2.QtGui import QIcon, QPainterPath, QRegion, QTransform, QCursor, QPixmap, QPainter, QFont
+from darkdetect import DarkMode
 
 
 class MainWindow(QMainWindow):
@@ -81,6 +82,13 @@ class MainWindow(QMainWindow):
         self.timerThread.started.connect(self.backRefresh.run)
         self.timerThread.finished.connect(self.backRefresh.finish)
         self.timerThread.start()
+
+        # create darkMode listener
+        self.darkModeThread = QThread()
+        self.darkModeListener = DarkModeListener(self.updateBatteryInfo)
+        self.darkModeListener.moveToThread(self.darkModeThread)
+        self.darkModeThread.started.connect(self.darkModeListener.run)
+        self.darkModeThread.start()
 
     def hideEvent(self, event):
         # tray position
@@ -185,7 +193,10 @@ class MainWindow(QMainWindow):
             return interval * 60 * 1000
 
     def quitApp(self):
+        self.darkModeListener.finish()
         self.timerThread.quit()
+        self.darkModeThread.quit()
+        self.darkModeThread.wait()
         app.quit()
 
 
@@ -217,6 +228,24 @@ class UpdateInfo(QObject):
     def run(self):
         self.func()
         self.finished.emit()
+
+
+class DarkModeListener(QObject):
+    finished = Signal()
+
+    def __init__(self, func):
+        super().__init__()
+        self.darkMode = DarkMode()
+        self.func = func
+
+    def changeTheme(self, args):
+        self.func()
+
+    def finish(self):
+        self.darkMode.stop()
+
+    def run(self):
+        self.darkMode.listener(self.changeTheme)
 
 
 if __name__ == "__main__":

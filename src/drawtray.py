@@ -2,7 +2,7 @@ from PySide2.QtCore import Qt, QRect, QRectF, QSize, QPointF
 from PySide2.QtGui import QPixmap, QPainter, QFont, QColor, QPen, QFontMetrics
 from PySide2.QtWidgets import QApplication
 from enum import Enum
-import darkdetect
+from darkdetect import DarkMode
 
 
 class IconStyle(Enum):
@@ -19,7 +19,7 @@ class TrayIcon:
         self.pixmap = QPixmap(self.bgWidth, self.bgHeight)
         self.pixmap.fill(Qt.transparent)
         if IconType == 'Tray':
-            self._color = Qt.white if darkdetect.isDark() else Qt.black
+            self._color = Qt.white if DarkMode().isDark() else Qt.black
         else:
             self._color = Qt.black
 
