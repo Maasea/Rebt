@@ -10,13 +10,14 @@ You can specify the mouse and adjust the frequency of battery updates using the 
 
 ## For user
 
-The exe or zip file can be downloaded directly from the [release ](https://github.com/Maasea/razerBattery/releases) page.
+The exe or zip file can be downloaded directly from the [release ](https://github.com/Maasea/razerBattery/releases)
+page.
 
 exe: small but slower startup
 
-zip: faster startup but  bigger
+zip: faster startup but bigger
 
-**Note**: 
+**Note**:
 
 - All the file require 64-bit system, but you can build 32-bit files by referring to the `For dev`
 - Configuration file directory: `user/username/rebt.ini`
@@ -24,7 +25,10 @@ zip: faster startup but  bigger
 
 ### Configuration
 
-The configuration file will be generated automatically when a Razer device is detected. You can change the icon style and update interval by editing it.
+The configuration file will be generated automatically when a Razer device is detected. You can change the icon style
+and update interval by editing it.
+
+Low battery alert will be turned off when `notification=0`
 
 ```
 [DEFAULT]
@@ -34,6 +38,7 @@ scale = [seconds, minutes]
 name = Mouse Name
 usbid = USB ID
 tranid = xxxx
+notification = [0-100]
 ```
 
 ## For dev
@@ -61,7 +66,8 @@ tranid = xxxx
    pyinstaller oneFile.spec
    ```
 
-**Note**: You can get more detailed information by reading  [razer-mouse-battery-windows](https://github.com/hsutungyu/razer-mouse-battery-windows).
+**Note**: You can get more detailed information by
+reading  [razer-mouse-battery-windows](https://github.com/hsutungyu/razer-mouse-battery-windows).
 
 ## Credit
 
