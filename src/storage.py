@@ -308,6 +308,7 @@ class RebtStorage:
         self.setInterval(15)
         self.setTrayStyle(0)
         self.setScale("seconds")
+        self.setNotification(15)
         self.readConfig()
 
     def isExist(self):
@@ -327,6 +328,7 @@ class RebtStorage:
         if option == "usbId": value = int(value, 16)
         if option == "tranId": value = int(value, 16)
         if option == "trayStyle": value = int(value)
+        if option == "notification": value = int(value)
         return value
 
     def setInterval(self, interval):
@@ -342,6 +344,9 @@ class RebtStorage:
 
     def setScale(self, scale):
         self.config.set("DEFAULT", "scale", scale)
+
+    def setNotification(self, battery):
+        self.config.set("DEFAULT", "notification", str(battery))
 
     def save(self):
         with open(self.path, "w") as configfile:

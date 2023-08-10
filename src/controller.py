@@ -9,6 +9,7 @@ from storage import RebtStorage, DEVICE
 class Rebt:
 
     def __init__(self) -> None:
+        self.needShow = True
         self.config = RebtStorage()
         self.findAll = True
         self.hasDefault = self.config.isExist()
@@ -20,8 +21,8 @@ class Rebt:
         mouses = usb.core.find(find_all=True, idVendor=0x1532, backend=self.backend)
         for mouse in mouses:
             for name, device in DEVICE.items():
-                knowProduct = int(device["usbId"], 16)
-                if knowProduct == mouse.idProduct:
+                knownProduct = int(device["usbId"], 16)
+                if knownProduct == mouse.idProduct:
                     self.config.generate(name, device["usbId"], device["tranId"])
                     self.hasDefault = True
                     return mouse
@@ -83,3 +84,16 @@ class Rebt:
         # 1 charging, 0 not
         charge_msg = self.charge_msg()
         return self.send_msg(charge_msg)
+
+    def show_battery_notification(self, battery):
+        notification_battery = self.config.getDefault("notification")
+        if notification_battery == 0:
+            return False
+
+        if battery > notification_battery:
+            self.needShow = True
+            return False
+
+        if self.needShow:
+            self.needShow = False
+            return True

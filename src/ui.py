@@ -31,15 +31,14 @@ class MainWindow(QMainWindow):
             self.rebt = Rebt()
             self.interval = self.rebt.config.getDefault("interval")
             self.scale = self.rebt.config.getDefault("scale")
+            self.mouseName = self.rebt.config.getDefault("name")
         except RuntimeError as e:
             print(e)
-            self.tray.showMessage("Error", str(e), self.defaultIcon)
+            self.showNotification("Error", str(e))
             time.sleep(4)
             sys.exit(0)
         if self.rebt.firstRun:
-            self.tray.showMessage("Detected",
-                                  self.rebt.config.getDefault("name").replace("_", " "),
-                                  self.defaultIcon)
+            self.showNotification("Detected", self.mouseName.replace("_", " "))
 
         # Popup window Properties
         self.window_width = 400
@@ -56,7 +55,9 @@ class MainWindow(QMainWindow):
         self.controlPanel.intervalSlider.sliderMoved.connect(self.showTips)
         self.controlPanel.intervalSlider.sliderReleased.connect(self.updateInterval)
         self.controlPanel.deviceBox.addItems(DEVICE.keys())
-        self.controlPanel.deviceBox.setCurrentText(self.rebt.config.getDefault("name"))
+        if self.mouseName not in DEVICE.keys():
+            self.controlPanel.deviceBox.addItem(self.mouseName)
+        self.controlPanel.deviceBox.setCurrentText(self.mouseName)
         self.controlPanel.deviceBox.currentTextChanged.connect(self.updateDevice)
         self.setCentralWidget(self.controlPanel)
         self.radius = 18
@@ -143,7 +144,7 @@ class MainWindow(QMainWindow):
         except RuntimeError as e:
             battery = 0
             isCharge = 0
-            self.tray.showMessage("Error", str(e), self.defaultIcon)
+            self.showNotification("Error", str(e))
         return battery, isCharge
 
     def generateIcon(self, battery, isCharge):
@@ -162,6 +163,9 @@ class MainWindow(QMainWindow):
 
     def updateBatteryInfo(self):
         battery, isCharge = self.getBatteryInfo()
+        if isCharge == 0 and self.rebt.show_battery_notification(battery):
+            print('show')
+            self.showNotification("Low Battery", f"Current Battery Level: {battery}%")
 
         self.curBattery = battery
         self.chargeStatus = isCharge
@@ -198,6 +202,11 @@ class MainWindow(QMainWindow):
         self.darkModeThread.quit()
         self.darkModeThread.wait()
         app.quit()
+
+    def showNotification(self, title, message):
+        self.tray.showMessage(title,
+                              message,
+                              self.defaultIcon)
 
 
 class BackRefresh(QObject):
