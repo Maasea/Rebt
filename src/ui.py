@@ -163,8 +163,7 @@ class MainWindow(QMainWindow):
 
     def updateBatteryInfo(self):
         battery, isCharge = self.getBatteryInfo()
-        if isCharge == 0 and self.rebt.show_battery_notification(battery):
-            print('show')
+        if isCharge == 0 and battery > 0 and self.rebt.show_battery_notification(battery):
             self.showNotification("Low Battery", f"Current Battery Level: {battery}%")
 
         self.curBattery = battery
